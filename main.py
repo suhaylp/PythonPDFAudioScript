@@ -1,15 +1,27 @@
-import PyPDF2
+import pypdf
 from gtts import gTTS
 
-path = open('dummy.pdf', 'rb')
-pdfReader = PyPDF2.PdfReader(path)
 
-text = ""
+def read_pdf(addr2pdf):
+    pdffileobject = open(addr2pdf, 'rb')
+    pdfreader = pypdf.PdfReader(pdffileobject)
+    num_pages = len(pdfreader.pages)
+    all_pages = ' '
 
-for page_num in range(len(pdfReader.pages)):
-    page = pdfReader.pages[page_num].extract_text()
-    text += page.strip().replace("\n", " ").replace(" ' ", "'")
+    for p in range(num_pages):
+        page_obj = pdfreader.pages[p]
+        text = page_obj.extract_text()
+        all_pages += text
 
-print("Converting PDF to MP3...")
-tts = gTTS(text=text, lang='en', slow=False)
-tts.save("output.mp3")
+    pdffileobject.close()
+    return all_pages
+
+def conv_text2speech(text2cov):
+    audio = gTTS(text=text2cov,lang="en", slow=False)
+    audio.save("output.mp3")
+
+if __name__ == '__main__':
+    pdf_content = read_pdf("dummy.pdf")
+    conv_text2speech(pdf_content)
+
+    # influenced by https://www.youtube.com/watch?v=cardL-Ydy34&ab_channel=TheCodingBuddiesGuild
